@@ -1,0 +1,44 @@
+version: "3.7"
+services:
+  # DATABASE
+  BATTLEBOAT_DB:
+    hostname: "BATTLEBOAT_DB"
+    image: "mysql:5.7"
+    container_name: "BATTLEBOAT_DB"
+    volumes:
+      - ./volumes/mysql_lib:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootpwdCHOCO"
+      MYSQL_DATABASE: "battleboat"
+      MYSQL_USER: "battleuser"
+      MYSQL_PASSWORD: "battlepass"
+    ports:
+      - 3306:3306
+    networks:
+      - battleboat
+    restart: "always"
+
+  # BATTLEBOAT_SERVICE
+  BATTLEBOAT_BACK:
+    hostname: "BATTLEBOAT_BACK"
+    image: "fake-backend"
+    container_name: "BATTLEBOAT_BACK"
+    volumes:
+      - ./files/battleboat:/etc/backend/static 
+    environment:
+      DATABASE_HOST: "BATTLEBOAT_DB"
+      DATABASE_NAME: "battleboat"
+      DATABASE_USER: "battleuser"
+      DATABASE_PASSWORD: "battlepass"
+      DATABASE_PORT: "3306"
+    ports:
+      - 8181:3000
+    restart: "always"
+    networks:
+      - battleboat
+    depends_on:
+      - BATTLEBOAT_DB
+
+networks:
+  battleboat:
+    name: "battleboat"
